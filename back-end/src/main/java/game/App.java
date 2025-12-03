@@ -42,16 +42,18 @@ public class App extends NanoHTTPD {
             }
             case "/undo" -> this.game = this.game.undo();
             case "/move" -> {
-                String dir = params.get("dir"); // "UP", "DOWN", "LEFT", "RIGHT"
+                String dir = params.get("dir");
                 Direction direction = Direction.valueOf(dir.toUpperCase());
                 this.game = this.game.move(direction);
             }
-            default -> {
-            }
         }
         
-        // Extract the view-specific data from the game and apply it to the template.
-        GameState gameplay = GameState.forGame(this.game);
-        return newFixedLengthResponse(gameplay.toString());
+        if(game.getBoard().ship.hasWon){
+            GameState gameplay = GameState.WinGame(this.game);
+            return newFixedLengthResponse(gameplay.toString());
+        } else {
+            GameState gameplay = GameState.forGame(this.game);
+            return newFixedLengthResponse(gameplay.toString());
+        }
     }
 }
