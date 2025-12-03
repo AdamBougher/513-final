@@ -11,6 +11,13 @@ public class Ship extends Observable implements moveable {
     public Ship(int x, int y){
         this.position = new Point(x, y);
     }
+
+    private void checkWin(){
+        //check if ship is on treasure
+        if(Board.getInstance().getCell(position.x, position.y).getState() == cellState.TREASURE){
+
+        }
+    }
     
     @Override   
     public void goNorth(boardCell goToState ){
