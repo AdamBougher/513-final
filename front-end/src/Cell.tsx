@@ -8,7 +8,7 @@ interface Props {
 class BoardCell extends React.Component<Props> {
   render(): React.ReactNode {
     let content = null;
-    
+
     switch (this.props.cell.state) {
       case 'ISLAND':
         content = <img src="island.jpg" alt="Island" className="sprite" />;
@@ -19,8 +19,14 @@ class BoardCell extends React.Component<Props> {
       case 'PIRATE':
         content = <img src="pirateShip.png" alt="Pirate" className="sprite" />;
         break;
+      case 'TREASURE':
+        content = <img src="Treasure-chest.png" alt="Treasure" className="sprite" />;
+        break;
+      case 'SEA_MONSTER':
+        content = <img src="monster.png" alt="Sea Monster" className="sprite" />;
+        break;
     }
-    
+
     return <div className={`cell ${this.props.cell.state.toLowerCase()}`}>{content}</div>;
   }
 }
