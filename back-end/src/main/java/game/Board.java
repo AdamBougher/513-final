@@ -1,19 +1,21 @@
 package game;
 
 import java.awt.Point;
+import java.util.ArrayList;
 
+import game.interfaces.pirateStratigy;
 
 public class Board {
     private boardCell[][] grid;
     public final int HEIGHT = 25;
     public final int WIDTH = 25;
-    public final int ISLAND_COUNT = 10;
+    public final int ISLAND_COUNT = 20;
     public final int PIRATE_COUNT = 2;
     public final int SEA_MONSTER_COUNT = 1;
     public Ship ship = new Ship(WIDTH/2, HEIGHT/2);
-    public pirateShip[] pirates;
-    public PirateShipFactory pirateFactory = new StandardPirateFactory();
-    public seaMonster[] seaMonsters;
+    public ArrayList<pirateShip> pirates;
+    public ArrayList<PirateShipFactory> pirateFactories;
+    public ArrayList<seaMonster> seaMonsters;
 
     private final cellState openStates[] = {cellState.WATER, cellState.TREASURE};
 
@@ -23,12 +25,37 @@ public class Board {
         initializeGrid();
     }
 
+    public void resetInstance() {
+        instance = null;
+    }
+
     public Board(Board other){
-        this.grid = other.grid;
-        this.ship = other.ship;
-        this.pirates = other.pirates;
-        this.pirateFactory = other.pirateFactory;
-        this.seaMonsters = other.seaMonsters;
+        this.grid = new boardCell[other.HEIGHT][other.WIDTH];
+        for(boardCell[] row : other.grid){
+            for(boardCell cell : row){
+                this.grid[cell.getPosition().x][cell.getPosition().y] = new boardCell(cell.getState(), new Point(cell.getPosition().x, cell.getPosition().y));
+            }
+        }
+
+        this.ship = new Ship(other.ship.getPosition().x, other.ship.getPosition().y);
+
+        this.pirates = new ArrayList<>();
+        for(pirateShip p : other.pirates){
+            Point pos = p.getPosition();
+            pirateShip newPirate = new pirateShip(p.ID, new Point(pos.x, pos.y), this);
+            this.pirates.add(newPirate);
+            this.ship.addObserver(newPirate);
+        }
+
+        this.pirateFactories = other.pirateFactories;
+
+        this.seaMonsters = new ArrayList<>();
+        for(seaMonster s : other.seaMonsters){
+            Point pos = s.getPosition();
+            seaMonster newSeaMonster = new seaMonster(s.ID, new Point(pos.x, pos.y), new bigCircle(this), this);
+            this.seaMonsters.add(newSeaMonster);
+            this.ship.addObserver(newSeaMonster);
+        }
     }
 
     public static Board getInstance() {
@@ -43,6 +70,8 @@ public class Board {
     }
 
     public void initializeGrid() {
+        ship.deleteObservers();
+
         this.grid = new boardCell[WIDTH][HEIGHT];
         // Initialize the board with WATER cells
         for (int i = 0; i < HEIGHT; i++) {
@@ -52,23 +81,30 @@ public class Board {
         }
 
         for (int i = 0; i < ISLAND_COUNT; i++) {
-            setCell(getRandomOpenCell(), cellState.ISLAND);
+            setCell(getRandomOpenCell(0), cellState.ISLAND);
         }
-
+        
+        pirateFactories = new ArrayList<>();
+        pirateFactories.add(new StandardPirateFactory());
         seaMonsters = placeSeaMonsters(SEA_MONSTER_COUNT);
 
-        pirates = new pirateShip[PIRATE_COUNT];
+        pirates = new ArrayList<>();
+
+        pirateStratigy[] strategies = {
+            new moveDirectlyTowardsShip(),
+            new moveTowardsShipNextPos()
+        };
 
         for(int i = 0; i < PIRATE_COUNT; i++) {
-            Point pos = getRandomOpenCell();
-            pirates[i] = pirateFactory.createPirateShip(i, pos, this);
+            Point pos = getRandomOpenCell(0);
+            pirates.add(pirateFactories.get(0).createPirateShip(i, pos, strategies[(int)(Math.random() * strategies.length)], this));
             setCell(new Point(pos.x, pos.y), cellState.PIRATE);
-            ship.addObserver(pirates[i]);
+            ship.addObserver(pirates.get(i));
         }
 
-        setCell(ship.getPosition(), cellState.SHIP);
+        setCell(new Point(WIDTH/2, HEIGHT/2), cellState.SHIP);
 
-        setCell(getRandomOpenCell(), cellState.TREASURE);
+        setCell(getRandomOpenCell(0), cellState.TREASURE);
     }
 
     public boardCell getCell(int x, int y) {
@@ -102,15 +138,15 @@ public class Board {
         return (p.x >= 0 && p.x < HEIGHT) && (p.y >= 0 && p.y < WIDTH);
     }
 
-    private seaMonster[] placeSeaMonsters(int amt){
+    private ArrayList<seaMonster> placeSeaMonsters(int amt){
         Point pos;
-        seaMonster[] s = new seaMonster[amt];
+        ArrayList<seaMonster> s = new ArrayList<>();
         
         for (int i = 0; i < amt; i++) {
-            pos = getRandomOpenCell();
-            s[i] = new seaMonster(i, pos, new bigCircle(this), this);
+            pos = getRandomOpenCell(-5);
+            s.add(new seaMonster(i, pos, new bigCircle(this), this));
 
-            ship.addObserver(s[i]);
+            ship.addObserver(s.get(i));
 
             setCell(new Point(pos.x, pos.y), cellState.SEA_MONSTER);
         }
@@ -118,11 +154,15 @@ public class Board {
         return s;
     }   
 
-    private Point getRandomOpenCell(){
+    private Point getRandomOpenCell(int offset){
         Point pos;
+        int hight;
+        int width;
 
         do { 
-            pos = new Point((int)(Math.random() * HEIGHT), (int)(Math.random() * WIDTH));
+            hight = (int)(Math.random() * (HEIGHT + offset));
+            width = (int)(Math.random() * (WIDTH + offset));
+            pos = new Point(hight, width);
         } while (grid[pos.x][pos.y].getState() != cellState.WATER);
 
         return pos;
@@ -133,9 +173,9 @@ public class Board {
     }
 
     public Point[] getPiratePositions() {
-        Point[] positions = new Point[pirates.length];
-        for (int i = 0; i < pirates.length; i++) {
-            positions[i] = pirates[i].getPosition();
+        Point[] positions = new Point[pirates.size()];
+        for (int i = 0; i < pirates.size(); i++) {
+            positions[i] = pirates.get(i).getPosition();
         }
         return positions;
     }
