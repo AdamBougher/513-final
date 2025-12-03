@@ -5,9 +5,9 @@ import java.awt.Point;
 
 public class Board implements  Cloneable {
     private boardCell[][] grid;
-    public final int ROWS = 10;
-    public final int COLS = 50;
-    public Ship ship = new Ship(5,5);
+    public final int HEIGHT = 25;
+    public final int WIDTH = 25;
+    public Ship ship = new Ship(WIDTH/2, HEIGHT/2);
     public pirateShip[] pirates;
 
     private static Board instance = null;
@@ -28,10 +28,10 @@ public class Board implements  Cloneable {
     }
 
     public void initializeGrid() {
-        this.grid = new boardCell[ROWS][COLS];
+        this.grid = new boardCell[WIDTH][HEIGHT];
         // Initialize the board with WATER cells
-        for (int i = 0; i < ROWS; i++) {
-            for (int j = 0; j < COLS; j++) {
+        for (int i = 0; i < HEIGHT; i++) {
+            for (int j = 0; j < WIDTH; j++) {
                 this.grid[i][j] = new boardCell(cellState.WATER, new java.awt.Point(i, j));
             }
         }
@@ -64,31 +64,31 @@ public class Board implements  Cloneable {
     }
 
     public boolean isValidPosition(int x, int y) {
-        return (x >= 0 && x < ROWS) && (y >= 0 && y < COLS);
+        return (x >= 0 && x < HEIGHT) && (y >= 0 && y < WIDTH);
     }
 
     private void placeIslands(int amt){
-        int x  = (int)(Math.random() * ROWS);
-        int y = (int)(Math.random() * COLS);
+        int x  = (int)(Math.random() * HEIGHT);
+        int y = (int)(Math.random() * WIDTH);
         
         for (int i = 0; i < amt; i++) {
             while (grid[x][y].getState() != cellState.WATER) {
-                x = (int)(Math.random() * ROWS);
-                y = (int)(Math.random() * COLS);
+                x = (int)(Math.random() * HEIGHT);
+                y = (int)(Math.random() * WIDTH);
             }
             setCell(new Point(x, y), cellState.ISLAND);
         }
     }
 
     private pirateShip [] placePirates(int amt){
-        int x  = (int)(Math.random() * ROWS);
-        int y = (int)(Math.random() * COLS);
+        int x  = (int)(Math.random() * HEIGHT);
+        int y = (int)(Math.random() * WIDTH);
         pirateShip[] p = new pirateShip[amt];
         
         for (int i = 0; i < amt; i++) {
             while (grid[x][y].getState() != cellState.WATER) {
-                x = (int)(Math.random() * ROWS);
-                y = (int)(Math.random() * COLS);
+                x = (int)(Math.random() * HEIGHT);
+                y = (int)(Math.random() * WIDTH);
             }
             p[i] = new pirateShip(x, y, i, this);
 
@@ -115,9 +115,9 @@ public class Board implements  Cloneable {
     @Override
     public Object clone() throws CloneNotSupportedException {
         Board clonedBoard = (Board) super.clone();
-        clonedBoard.grid = new boardCell[ROWS][COLS];
-        for (int i = 0; i < ROWS; i++) {
-            for (int j = 0; j < COLS; j++) {
+        clonedBoard.grid = new boardCell[HEIGHT][WIDTH];
+        for (int i = 0; i < HEIGHT; i++) {
+            for (int j = 0; j < WIDTH; j++) {
                 boardCell originalCell = this.grid[i][j];
                 clonedBoard.grid[i][j] = new boardCell(originalCell.getState(), new Point(originalCell.getPosition()));
             }

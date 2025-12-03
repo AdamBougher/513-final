@@ -58,7 +58,7 @@ public class Game {
         }
         
         // Check bounds
-        if (newX < 0 || newX >= newBoard.ROWS || newY < 0 || newY >= newBoard.COLS) {
+        if (newX < 0 || newX >= newBoard.HEIGHT || newY < 0 || newY >= newBoard.WIDTH) {
             return this; // Out of bounds, return unchanged
         }
         
