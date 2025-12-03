@@ -25,6 +25,7 @@ public class App extends NanoHTTPD {
     public App() throws IOException {
         super(8081);
 
+        GameState.state = GameStates.ONGOING;
         this.game = new Game();
 
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
@@ -33,27 +34,29 @@ public class App extends NanoHTTPD {
 
     @Override
     public Response serve(IHTTPSession session) {
-        String uri = session.getUri();
-        Map<String, String> params = session.getParms();
-        switch (uri) {
-            case "/newgame" -> {
-                this.game = new Game();
-                this.game.getBoard().NewGame();
+        if(GameState.state != GameStates.WIN_GAME)
+        {
+            String uri = session.getUri();
+            Map<String, String> params = session.getParms();
+            switch (uri) {
+                case "/newgame" -> {
+                    this.game = new Game();
+                    this.game.getBoard().NewGame();
+                    GameState.state = GameStates.ONGOING;
+                }
+                case "/undo" -> this.game = this.game.undo();
+                case "/move" -> {
+                    String dir = params.get("dir");
+                    Direction direction = Direction.valueOf(dir.toUpperCase());
+                    this.game = this.game.move(direction);
+                }
             }
-            case "/undo" -> this.game = this.game.undo();
-            case "/move" -> {
-                String dir = params.get("dir");
-                Direction direction = Direction.valueOf(dir.toUpperCase());
-                this.game = this.game.move(direction);
-            }
-        }
-        
-        if(game.getBoard().ship.hasWon){
-            GameState gameplay = GameState.WinGame(this.game);
-            return newFixedLengthResponse(gameplay.toString());
-        } else {
             GameState gameplay = GameState.forGame(this.game);
             return newFixedLengthResponse(gameplay.toString());
         }
+        
+        GameState gameplay = GameState.WinGame(this.game);
+        return newFixedLengthResponse(gameplay.toString());
+        
     }
 }
