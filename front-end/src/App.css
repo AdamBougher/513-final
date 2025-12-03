@@ -3,17 +3,20 @@
   --border: black;
   --playable-cell: rgba(255, 0, 0, 0.952);
   --unplayed-cell: #2196F3;
+  --cols: 25;
 }
 
 #board {
   display: grid;
-  grid-template-columns: repeat(50, 1fr); /* 10x10 grid */
+  grid-template-columns: repeat(25, 1fr);
   gap: 1px;
   background-color: #0077be;
   padding: 10px;
-  max-width: 500px;
+  max-width: 100vh;
+  max-height: 100vh;
   margin: auto;
 }
+
 
 .cell {
   aspect-ratio: 1;
