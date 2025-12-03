@@ -20,6 +20,11 @@ public class GameState {
         return new GameState(cells, game.getBoard().ship.getPosition(), "ONGOING");
     }
 
+    public static GameState WinGame(Game game) {
+        boardCell[] cells = getCells(game);
+        return new GameState(cells, game.getBoard().ship.getPosition(), "You Won!");
+    }
+
     public boardCell[] getCells() {
         return this.cells;
     }
