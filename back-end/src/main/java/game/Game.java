@@ -1,6 +1,5 @@
 package game;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +9,7 @@ import game.interfaces.Direction;
 public class Game {
     private Board board;
     private final List<Game> history;
+    public boolean hasWon = false;
 
     public Game() {
         this.board = Board.getInstance();
@@ -30,20 +30,17 @@ public class Game {
     }
 
     public Game move(Direction direction) {
+        if (GameState.state != GameStates.ONGOING || hasWon) {
+            return null;
+        }
+
         // Save current state for undo
         List<Game> newHistory = new ArrayList<>(history);
         newHistory.add(this);
         
-        // Create deep copy of board for immutability
-        Board newBoard;
-
-        newBoard = new Board(this.board);
-  
-        Ship ship = newBoard.ship;
-        
         // Get target cell
-        int newX = ship.getPosition().x;
-        int newY = ship.getPosition().y;
+        int newX = board.ship.getPosition().x;
+        int newY = board.ship.getPosition().y;
         
         switch (direction) {
             case UP -> newY -= 1;
@@ -53,29 +50,31 @@ public class Game {
         }
         
         // Check bounds
-        if (newX < 0 || newX >= newBoard.HEIGHT || newY < 0 || newY >= newBoard.WIDTH) {
+        if (newX < 0 || newX >= board.HEIGHT || newY < 0 || newY >= board.WIDTH) {
             return this; // Out of bounds, return unchanged
         }
         
-        boardCell targetCell = newBoard.getCell(newX, newY);
+        boardCell targetCell = board.getCell(newX, newY);
         
         // Clear old ship position
-        newBoard.clearCell(ship.getPosition());
+        board.clearCell(board.ship.getPosition());
         
         // Move ship using its interface metho
         switch (direction) {
-            case UP -> ship.goNorth(targetCell);
-            case DOWN -> ship.goSouth(targetCell);
-            case LEFT -> ship.goWest(targetCell);
-            case RIGHT -> ship.goEast(targetCell);
+            case UP -> board.ship.goNorth(targetCell);
+            case DOWN -> board.ship.goSouth(targetCell);
+            case LEFT -> board.ship.goWest(targetCell);
+            case RIGHT -> board.ship.goEast(targetCell);
         }
 
-        ship.checkWin(new Point(newX, newY));
+        if(targetCell.getState() == cellState.TREASURE){
+            GameState.state = GameStates.WIN_GAME;
+        }
         
         // Update ship position on board
-        newBoard.setCell(ship.getPosition(), cellState.SHIP);
+        board.setCell(board.ship.getPosition(), cellState.SHIP);
         
-        return new Game(newBoard, newHistory);
+        return new Game(board, newHistory);
     }
 
     public Game undo() {
