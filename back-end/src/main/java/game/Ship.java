@@ -7,16 +7,18 @@ import game.interfaces.moveable;
 
 public class Ship extends Observable implements moveable {
     private Point position;
+    public boolean hasWon = false;
 
     public Ship(int x, int y){
         this.position = new Point(x, y);
     }
 
-    private void checkWin(){
-        //check if ship is on treasure
-        if(Board.getInstance().getCell(position.x, position.y).getState() == cellState.TREASURE){
-
+    public Boolean checkWin(Point pos){
+        if (Board.getInstance().getCell(pos.x, pos.y).getState() == cellState.TREASURE){
+            hasWon = true;
+            return true;
         }
+        return false;
     }
     
     @Override   
