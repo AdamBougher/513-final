@@ -37,11 +37,11 @@ public class GameState {
 
     private static boardCell[] getCells(Game game) {
         Board board = game.getBoard();
-        boardCell[] cells = new boardCell[board.ROWS * board.COLS];
+        boardCell[] cells = new boardCell[board.HEIGHT * board.WIDTH];
         
-        for (int x = 0; x < board.ROWS; x++) {
-            for (int y = 0; y < board.COLS; y++) {
-                cells[y * board.ROWS + x] = board.getCell(x, y);
+        for (int x = 0; x < board.HEIGHT; x++) {
+            for (int y = 0; y < board.WIDTH; y++) {
+                cells[y * board.HEIGHT + x] = board.getCell(x, y);
             }
         }
         return cells;
