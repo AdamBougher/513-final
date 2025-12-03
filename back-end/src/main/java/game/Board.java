@@ -3,17 +3,32 @@ package game;
 import java.awt.Point;
 
 
-public class Board implements  Cloneable {
+public class Board {
     private boardCell[][] grid;
     public final int HEIGHT = 25;
     public final int WIDTH = 25;
+    public final int ISLAND_COUNT = 10;
+    public final int PIRATE_COUNT = 2;
+    public final int SEA_MONSTER_COUNT = 1;
     public Ship ship = new Ship(WIDTH/2, HEIGHT/2);
     public pirateShip[] pirates;
+    public PirateShipFactory pirateFactory = new StandardPirateFactory();
+    public seaMonster[] seaMonsters;
+
+    private final cellState openStates[] = {cellState.WATER, cellState.TREASURE};
 
     private static Board instance = null;
 
     private Board(){
         initializeGrid();
+    }
+
+    public Board(Board other){
+        this.grid = other.grid;
+        this.ship = other.ship;
+        this.pirates = other.pirates;
+        this.pirateFactory = other.pirateFactory;
+        this.seaMonsters = other.seaMonsters;
     }
 
     public static Board getInstance() {
@@ -35,10 +50,25 @@ public class Board implements  Cloneable {
                 this.grid[i][j] = new boardCell(cellState.WATER, new java.awt.Point(i, j));
             }
         }
-        placeIslands(10);
-        pirates = placePirates(2);
+
+        for (int i = 0; i < ISLAND_COUNT; i++) {
+            setCell(getRandomOpenCell(), cellState.ISLAND);
+        }
+
+        seaMonsters = placeSeaMonsters(SEA_MONSTER_COUNT);
+
+        pirates = new pirateShip[PIRATE_COUNT];
+
+        for(int i = 0; i < PIRATE_COUNT; i++) {
+            Point pos = getRandomOpenCell();
+            pirates[i] = pirateFactory.createPirateShip(i, pos, this);
+            setCell(new Point(pos.x, pos.y), cellState.PIRATE);
+            ship.addObserver(pirates[i]);
+        }
 
         setCell(ship.getPosition(), cellState.SHIP);
+
+        setCell(getRandomOpenCell(), cellState.TREASURE);
     }
 
     public boardCell getCell(int x, int y) {
@@ -46,11 +76,12 @@ public class Board implements  Cloneable {
     }
 
     public Boolean isCellOpen(Point position) {
+
         if (!isValidPosition(position.x, position.y)) {
             return false;
         }
 
-        return grid[position.x][position.y].getState() == cellState.WATER;
+        return java.util.Arrays.asList(openStates).contains(grid[position.x][position.y].getState());
     }
 
     public void setCell(Point position, cellState state) {
@@ -67,38 +98,35 @@ public class Board implements  Cloneable {
         return (x >= 0 && x < HEIGHT) && (y >= 0 && y < WIDTH);
     }
 
-    private void placeIslands(int amt){
-        int x  = (int)(Math.random() * HEIGHT);
-        int y = (int)(Math.random() * WIDTH);
-        
-        for (int i = 0; i < amt; i++) {
-            while (grid[x][y].getState() != cellState.WATER) {
-                x = (int)(Math.random() * HEIGHT);
-                y = (int)(Math.random() * WIDTH);
-            }
-            setCell(new Point(x, y), cellState.ISLAND);
-        }
+    public boolean isValidPosition(Point p) {
+        return (p.x >= 0 && p.x < HEIGHT) && (p.y >= 0 && p.y < WIDTH);
     }
 
-    private pirateShip [] placePirates(int amt){
-        int x  = (int)(Math.random() * HEIGHT);
-        int y = (int)(Math.random() * WIDTH);
-        pirateShip[] p = new pirateShip[amt];
+    private seaMonster[] placeSeaMonsters(int amt){
+        Point pos;
+        seaMonster[] s = new seaMonster[amt];
         
         for (int i = 0; i < amt; i++) {
-            while (grid[x][y].getState() != cellState.WATER) {
-                x = (int)(Math.random() * HEIGHT);
-                y = (int)(Math.random() * WIDTH);
-            }
-            p[i] = new pirateShip(x, y, i, this);
+            pos = getRandomOpenCell();
+            s[i] = new seaMonster(i, pos, new bigCircle(this), this);
 
-            ship.addObserver(p[i]);
+            ship.addObserver(s[i]);
 
-            setCell(new Point(x, y), cellState.PIRATE);
+            setCell(new Point(pos.x, pos.y), cellState.SEA_MONSTER);
         }
 
-        return p;
+        return s;
     }   
+
+    private Point getRandomOpenCell(){
+        Point pos;
+
+        do { 
+            pos = new Point((int)(Math.random() * HEIGHT), (int)(Math.random() * WIDTH));
+        } while (grid[pos.x][pos.y].getState() != cellState.WATER);
+
+        return pos;
+    }
 
     public Ship getColumbus() {
         return ship;
@@ -110,28 +138,6 @@ public class Board implements  Cloneable {
             positions[i] = pirates[i].getPosition();
         }
         return positions;
-    }
-
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        Board clonedBoard = (Board) super.clone();
-        clonedBoard.grid = new boardCell[HEIGHT][WIDTH];
-        for (int i = 0; i < HEIGHT; i++) {
-            for (int j = 0; j < WIDTH; j++) {
-                boardCell originalCell = this.grid[i][j];
-                clonedBoard.grid[i][j] = new boardCell(originalCell.getState(), new Point(originalCell.getPosition()));
-            }
-        }
-        // Clone ship
-        clonedBoard.ship = new Ship(this.ship.getPosition().x, this.ship.getPosition().y);
-        // Clone pirates
-        clonedBoard.pirates = new pirateShip[this.pirates.length];
-        for (int i = 0; i < this.pirates.length; i++) {
-            Point pos = this.pirates[i].getPosition();
-            clonedBoard.pirates[i] = new pirateShip(pos.x, pos.y, this.pirates[i].ID, clonedBoard);
-            clonedBoard.ship.addObserver(clonedBoard.pirates[i]);
-        }
-        return clonedBoard;
     }
 
 }
