@@ -11,9 +11,18 @@ public class pirateShip extends Enemy implements Observer {
 
     private pirateStratigy strategy;
 
-    public pirateShip(int x, int y, int ID, Board board){
+    public pirateShip(int x, int y, int ID, pirateStratigy strategy, Board board){
         this.ID = ID;
         this.position = new Point(x, y);
+        this.strategy = strategy;
+        this.history = new ArrayList<>();
+        history.add(board.getCell(position.x, position.y));
+        this.board = board;
+    }
+
+    public pirateShip(int iD, Point point, Board board) {
+        this.ID = 0;
+        this.position = new Point(point.x, point.y);
         this.strategy = new moveDirectlyTowardsShip();
         this.history = new ArrayList<>();
         history.add(board.getCell(position.x, position.y));
