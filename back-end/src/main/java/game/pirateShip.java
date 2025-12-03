@@ -33,6 +33,10 @@ public class pirateShip extends Enemy implements Observer {
 
         Move(strategy.moveTowardsShip(new Point(shipPosition[0], shipPosition[1]), position, history));
 
+        if(position.x == shipPosition[0] && position.y == shipPosition[1]) {
+            GameState.state = GameStates.LOST_GAME;
+        }
+
         board.setCell(position, cellState.PIRATE);
         
         history.add(board.getCell(position.x, position.y));

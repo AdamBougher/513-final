@@ -12,6 +12,7 @@ public abstract class Enemy implements moveable {
     protected  Point position;
     protected  ArrayList<boardCell> history;
     protected  Board board;
+    protected cellState[] accepStates = {cellState.WATER, cellState.SHIP, cellState.TREASURE};
 
     protected void Move(Direction dir) {
         switch(dir){
@@ -29,25 +30,25 @@ public abstract class Enemy implements moveable {
 
     @Override
     public void goNorth(boardCell goToState) {
-        if (goToState.getState() == cellState.WATER)
+        if (java.util.Arrays.asList(accepStates).contains(goToState.getState()))
             position.y -= 1;
     }
 
     @Override
     public void goSouth(boardCell goToState) {
-        if (goToState.getState() == cellState.WATER)
+        if (java.util.Arrays.asList(accepStates).contains(goToState.getState()))
             position.y += 1;
     }
 
     @Override
     public void goEast(boardCell goToState) {
-        if (goToState.getState() == cellState.WATER)
+        if (java.util.Arrays.asList(accepStates).contains(goToState.getState()))
             position.x += 1;
     }
 
     @Override
     public void goWest(boardCell goToState) {
-        if (goToState.getState() == cellState.WATER)
+        if (java.util.Arrays.asList(accepStates).contains(goToState.getState()))
             position.x -= 1;
     }
 
