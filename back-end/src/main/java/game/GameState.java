@@ -7,17 +7,34 @@ public class GameState {
 
     private final boardCell[] cells;
     private final Point shipPosition;
+    public static GameStates state;
     private String status;
 
     private GameState(boardCell[] cells, Point shipPosition, String status) { 
         this.cells = cells;
         this.shipPosition = shipPosition;
         this.status = status;
+        GameState.state = GameStates.ONGOING;
     }
 
     public static GameState forGame(Game game) {
-        boardCell[] cells = getCells(game);
-        return new GameState(cells, game.getBoard().ship.getPosition(), "ONGOING");
+        switch (state) {
+            case ONGOING -> {
+                boardCell[] cells = getCells(game);
+                return new GameState(cells, game.getBoard().ship.getPosition(), "ONGOING");
+            }
+            case LOST_GAME -> {
+                boardCell[] cells = getCells(game);
+                return new GameState(cells, game.getBoard().ship.getPosition(), "You Lost!");
+            }
+            case WIN_GAME -> {
+                boardCell[] cells = getCells(game);
+                return new GameState(cells, game.getBoard().ship.getPosition(), "You Won!");
+            }
+            default -> {
+            }
+        }
+        return null;
     }
 
     public static GameState WinGame(Game game) {
