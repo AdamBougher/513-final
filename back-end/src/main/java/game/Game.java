@@ -37,13 +37,8 @@ public class Game {
         // Create deep copy of board for immutability
         Board newBoard;
 
-        try {
-            newBoard = (Board)board.clone();
-        } catch (CloneNotSupportedException ex) {
-            System.err.println("Cloning not supported: " + ex.getMessage());
-            return this; // Return unchanged game on failure
-        }
-
+        newBoard = new Board(this.board);
+  
         Ship ship = newBoard.ship;
         
         // Get target cell
@@ -66,35 +61,19 @@ public class Game {
         
         // Clear old ship position
         newBoard.clearCell(ship.getPosition());
-
-        // Update pirates before moving ship
-        // Update pirate positions (they chase the ship via Observer pattern)
-        // Pirates automatically update via ship.notifyObservers()
-        Point[] oldPiratePositions = new Point[newBoard.pirates.length];
-        for (int i = 0; i < newBoard.pirates.length; i++) {
-            oldPiratePositions[i] = new Point(newBoard.pirates[i].getPosition());
-        }
-
-        // Clear old pirate cells using saved positions
-        for (Point oldPos : oldPiratePositions) {
-            newBoard.clearCell(oldPos);
-        }
         
-        // Move ship using its interface method
+        // Move ship using its interface metho
         switch (direction) {
             case UP -> ship.goNorth(targetCell);
             case DOWN -> ship.goSouth(targetCell);
             case LEFT -> ship.goWest(targetCell);
             case RIGHT -> ship.goEast(targetCell);
         }
+
+        ship.checkWin(new Point(newX, newY));
         
         // Update ship position on board
         newBoard.setCell(ship.getPosition(), cellState.SHIP);
-
-        // Pirates move in their update() method, now update board
-        for (pirateShip pirate : newBoard.pirates) {
-            newBoard.setCell(pirate.getPosition(), cellState.PIRATE);
-        }
         
         return new Game(newBoard, newHistory);
     }
@@ -105,7 +84,5 @@ public class Game {
     }
     
 
-    public boolean isGameOver() {
-        return false; // Placeholder for actual game over logic
-    }
+    
 }
