@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
+import game.interfaces.Enemy;
 import game.interfaces.monsterStratigy;
 
 public class seaMonster extends Enemy implements Observer {

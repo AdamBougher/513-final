@@ -109,6 +109,9 @@ class App extends React.Component<Props, GameState> {
    */
   handleKeyPress = async (e: KeyboardEvent) => {
     let dir: string | null = null;
+    if(this.state.status != 'ONGOING') {
+      return;
+    }
     switch (e.key) {
       case 'ArrowUp':    dir = 'UP'; break;
       case 'ArrowDown':  dir = 'DOWN'; break;

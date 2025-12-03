@@ -1,34 +1,38 @@
-package game;
+package game.stratagies;
 
 import java.awt.Point;
 import java.util.ArrayList;
 
+import game.Board;
+import game.boardCell;
 import game.interfaces.Direction;
 import game.interfaces.pirateStratigy;
 
-public class moveDirectlyTowardsShip implements pirateStratigy {
+public class moveTowardsShipNextPos implements pirateStratigy {
     private ArrayList<boardCell> history;
 
     @Override
     public Direction moveTowardsShip(Point shipPosition, Point piratePosition, java.util.ArrayList<boardCell> history) {
         this.history = history;
+        int shipNextX = shipPosition.x;
+        int shipNextY = shipPosition.y+1;
         
-        if (Math.abs(shipPosition.y - piratePosition.y) > Math.abs(shipPosition.x - piratePosition.x)) {
+        if (Math.abs(shipNextY - piratePosition.y) > Math.abs(shipNextX - piratePosition.x)) {
             // if vertical distance is greater, move vertically
-            if (shipPosition.y < piratePosition.y) {
+            if (shipNextY < piratePosition.y) {
                 return TryMove(new char[] {'U','R', 'D', 'L'}, piratePosition);
             }
 
-            if (shipPosition.y > piratePosition.y) {
+            if (shipNextY > piratePosition.y) {
                 return TryMove(new char[] {'D','L', 'U', 'R'}, piratePosition);
             }
         }else{
             // if horizontal distance is greater, move horizontally
-            if (shipPosition.x < piratePosition.x) {
+            if (shipNextX < piratePosition.x) {
                 return TryMove(new char[] {'L','U', 'R', 'D'}, piratePosition);
             }
             
-            if (shipPosition.x > piratePosition.x) {
+            if (shipNextX > piratePosition.x) {
                 return TryMove(new char[] {'R','D', 'L', 'U'}, piratePosition);
             }
         }

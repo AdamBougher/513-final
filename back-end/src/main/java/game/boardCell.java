@@ -4,21 +4,25 @@ import java.awt.Point;
 
 public class boardCell {
     private cellState state;
-    private Point position;
+    private final Point position;
+
 
     public boardCell(cellState state, Point position) {
         this.state = state;
         this.position = position;
     }
 
+    // Get the state of the cell
     public cellState getState() {
         return state;
     }
 
+    // Get the position of the cell
     public Point getPosition() {
         return position;
     }
     
+    // Set the state of the cell
     public void setState(cellState state) {
         this.state = state;
     }

@@ -1,12 +1,15 @@
 package game;
 
+import java.awt.Point;
+
 import game.interfaces.pirateStratigy;
 
 public class StandardPirateFactory extends PirateShipFactory {
-
+    
     @Override
-    public pirateShip createPirateShip(int id, java.awt.Point initialPosition, pirateStratigy strategy, Board board) {
-        pirateShip pirate = new pirateShip(initialPosition.x, initialPosition.y, id, strategy, board);
+    public pirateShip createPirateShip(int id, pirateStratigy strategy, Board board) {
+        Point initialPosition = getRandomOpenCell(board.HEIGHT, board.WIDTH, board.getGrid(), -2);
+        pirateShip pirate = new pirateShip(initialPosition, id, strategy, board);
         return pirate;
     }
 

@@ -34,28 +34,26 @@ public class App extends NanoHTTPD {
 
     @Override
     public Response serve(IHTTPSession session) {
-        if(GameState.state != GameStates.WIN_GAME)
-        {
-            String uri = session.getUri();
-            Map<String, String> params = session.getParms();
-            switch (uri) {
-                case "/newgame" -> {
-                    this.game = new Game();
-                    this.game.getBoard().NewGame();
-                    GameState.state = GameStates.ONGOING;
-                }
-                case "/undo" -> this.game = this.game.undo();
-                case "/move" -> {
-                    String dir = params.get("dir");
-                    Direction direction = Direction.valueOf(dir.toUpperCase());
-                    this.game = this.game.move(direction);
-                }
+        String uri = session.getUri();
+        Map<String, String> params = session.getParms();
+        switch (uri) {
+            case "/newgame" -> {
+                Board.resetInstance();
+                this.game = new Game();
+                GameState.state = GameStates.ONGOING;
             }
-            GameState gameplay = GameState.forGame(this.game);
-            return newFixedLengthResponse(gameplay.toString());
+            case "/undo" -> this.game = this.game.undo();
+            case "/move" -> {
+                if(GameState.state != GameStates.ONGOING){
+                    break;
+                }
+                String dir = params.get("dir");
+                Direction direction = Direction.valueOf(dir.toUpperCase());
+                this.game = this.game.move(direction);
+            }
         }
         
-        GameState gameplay = GameState.WinGame(this.game);
+        GameState gameplay = GameState.forGame(this.game);
         return newFixedLengthResponse(gameplay.toString());
         
     }

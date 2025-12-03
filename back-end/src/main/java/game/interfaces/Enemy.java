@@ -1,10 +1,11 @@
-package game;
+package game.interfaces;
 
 import java.awt.Point;
 import java.util.ArrayList;
 
-import game.interfaces.Direction;
-import game.interfaces.moveable;
+import game.Board;
+import game.boardCell;
+import game.cellState;
 
 public abstract class Enemy implements moveable {
     public     int ID;
@@ -22,6 +23,7 @@ public abstract class Enemy implements moveable {
                 goEast(new boardCell(cellState.WATER, position));
             case LEFT -> // West
                 goWest(new boardCell(cellState.WATER, position));
+            default -> throw new IllegalArgumentException("Unexpected value: " + dir);
         }
     }
 

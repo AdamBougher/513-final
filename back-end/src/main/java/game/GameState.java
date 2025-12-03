@@ -1,35 +1,31 @@
 package game;
 
-import java.awt.Point;
 import java.util.Arrays;
 
 public class GameState {
 
     private final boardCell[] cells;
-    private final Point shipPosition;
     public static GameStates state;
-    private String status;
+    private final String status;
 
-    private GameState(boardCell[] cells, Point shipPosition, String status) { 
+    private GameState(boardCell[] cells, String status) { 
         this.cells = cells;
-        this.shipPosition = shipPosition;
         this.status = status;
-        GameState.state = GameStates.ONGOING;
     }
 
     public static GameState forGame(Game game) {
         switch (state) {
             case ONGOING -> {
                 boardCell[] cells = getCells(game);
-                return new GameState(cells, game.getBoard().ship.getPosition(), "ONGOING");
+                return new GameState(cells, "ONGOING");
             }
             case LOST_GAME -> {
                 boardCell[] cells = getCells(game);
-                return new GameState(cells, game.getBoard().ship.getPosition(), "You Lost!");
+                return new GameState(cells, "You Lost!");
             }
             case WIN_GAME -> {
                 boardCell[] cells = getCells(game);
-                return new GameState(cells, game.getBoard().ship.getPosition(), "You Won!");
+                return new GameState(cells, "You Won!");
             }
             default -> {
             }
@@ -39,7 +35,7 @@ public class GameState {
 
     public static GameState WinGame(Game game) {
         boardCell[] cells = getCells(game);
-        return new GameState(cells, game.getBoard().ship.getPosition(), "You Won!");
+        return new GameState(cells, "You Won!");
     }
 
     public boardCell[] getCells() {

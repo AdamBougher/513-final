@@ -5,28 +5,24 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
+import game.interfaces.Enemy;
 import game.interfaces.pirateStratigy;
 
 public class pirateShip extends Enemy implements Observer {
 
     private pirateStratigy strategy;
 
-    public pirateShip(int x, int y, int ID, pirateStratigy strategy, Board board){
+    public pirateShip(Point position, int ID, pirateStratigy strategy, Board board){
         this.ID = ID;
-        this.position = new Point(x, y);
+        this.position = new Point(position.x, position.y);
         this.strategy = strategy;
         this.history = new ArrayList<>();
         history.add(board.getCell(position.x, position.y));
         this.board = board;
     }
 
-    public pirateShip(int iD, Point point, Board board) {
-        this.ID = 0;
-        this.position = new Point(point.x, point.y);
-        this.strategy = new moveDirectlyTowardsShip();
-        this.history = new ArrayList<>();
-        history.add(board.getCell(position.x, position.y));
-        this.board = board;
+    public pirateStratigy getStrategy() {
+        return strategy;
     }
 
     @Override

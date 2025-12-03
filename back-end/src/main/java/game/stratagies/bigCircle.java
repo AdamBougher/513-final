@@ -1,7 +1,8 @@
-package game;
+package game.stratagies;
 
 import java.awt.Point;
 
+import game.Board;
 import game.interfaces.Direction;
 import game.interfaces.monsterStratigy;
 
@@ -39,6 +40,7 @@ public class bigCircle implements monsterStratigy {
             case DOWN -> pd = new PointDirection(new Point(newPosition.x, newPosition.y + 1), Direction.DOWN);
             case LEFT -> pd = new PointDirection(new Point(newPosition.x - 1, newPosition.y), Direction.LEFT);
             case RIGHT -> pd = new PointDirection(new Point(newPosition.x + 1, newPosition.y), Direction.RIGHT);
+            default -> throw new IllegalArgumentException("Unexpected value: " + direction);
         }
 
         if(pd != null && board.isCellOpen(pd.point)){

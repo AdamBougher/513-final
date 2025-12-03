@@ -1,12 +1,17 @@
 package game;
 
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.When;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.And;
-import game.interfaces.Direction;
 import java.awt.Point;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import game.interfaces.Direction;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 
 public class StepDefinitions {
     private Game game;
@@ -126,6 +131,6 @@ public class StepDefinitions {
     public void the_pirates_should_move_towards_the_ship() {
         // Pirates move as observers, just verify they exist and are still tracking
         assertNotNull("Pirates should exist", board.pirates);
-        assertTrue("Pirates should be tracking ship", board.pirates.size() > 0);
+        assertTrue("Pirates should be tracking ship", !board.pirates.isEmpty());
     }
 }
