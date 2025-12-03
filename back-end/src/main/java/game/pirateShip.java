@@ -23,16 +23,14 @@ public class pirateShip extends Enemy implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         int[] shipPosition = (int[]) arg;
-        int shipX = shipPosition[0];
-        int shipY = shipPosition[1];
 
-        int x = this.position.x;
-        int y = this.position.y;
+        board.clearCell(position);
 
-        Move(strategy.moveTowardsShip(new Point(shipX, shipY), position, history));
+        Move(strategy.moveTowardsShip(new Point(shipPosition[0], shipPosition[1]), position, history));
 
+        board.setCell(position, cellState.PIRATE);
+        
         history.add(board.getCell(position.x, position.y));
-
     }
 
 
