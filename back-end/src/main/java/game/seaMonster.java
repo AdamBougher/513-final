@@ -27,6 +27,10 @@ public class seaMonster extends Enemy implements Observer {
         Move(strategy.Move(this.position));
 
         board.setCell(position, cellState.SEA_MONSTER);
+        
+        if(position.x == board.ship.getPosition().x && position.y == board.ship.getPosition().y) {
+            GameState.state = GameStates.LOST_GAME;
+        }
 
         history.add(board.getCell(position.x, position.y));
     }
